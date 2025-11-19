@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Payment Page</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .products {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .product-card {
+      width: 260px;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .product-card h3 {
+      margin: 10px 0;
+    }
+
+    .price {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .buy-btn {
+      padding: 10px 15px;
+      border: none;
+      background: #3399cc;
+      color: white;
+      font-size: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .buy-btn:hover {
+      background: #287aa3;
+    }
+
+    .product-card img {
+  width: 100%;
+  height: 180px;      /* Ensures all images same height */
+  object-fit: cover;  /* Makes images auto-fit cleanly */
+  border-radius: 8px;
+}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🛒 Choose Your Product</h1>
+
+ <div class="products">
+
+  <!-- Product 1 -->
+  <div class="product-card">
+    <img src="images/headphone.jpeg" alt="Product 1">
+    <h3>Wireless Headphones</h3>
+    <div class="price">₹999</div>
+    <button class="buy-btn" onclick="startPayment(999)">Buy Now</button>
+  </div>
+
+  <!-- Product 2 -->
+  <div class="product-card">
+    <img src="images/smartwath.png" alt="Product 2">
+    <h3>Smart Watch</h3>
+    <div class="price">₹1499</div>
+    <button class="buy-btn" onclick="startPayment(1499)">Buy Now</button>
+  </div>
+
+  <!-- Product 3 -->
+  <div class="product-card">
+    <img src="images/speaker.png" alt="Product 3">
+    <h3>Bluetooth Speaker</h3>
+    <div class="price">₹699</div>
+    <button class="buy-btn" onclick="startPayment(699)">Buy Now</button>
+  </div>
+
+</div>
+
+</div>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+async function startPayment(amount) {
+  // Create order from backend
+  const response = await fetch("http://localhost:3000/create-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ amount }),
+  });
+  const data = await response.json();
+
+  const options = {
+    key: "rzp_test_RhbFZxqvrbs4I0", // Replace with your Razorpay Key ID
+    amount: amount * 100,
+    currency: "INR",
+    name: "My Shop",
+    description: "Purchase Product",
+    order_id: data.data.id, 
+
+    handler: async function (response) {
+      // Verify payment
+      const verify = await fetch("http://localhost:3000/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response),
+      });
+
+      const result = await verify.json();
+      alert(result.message);
+    },
+
+    theme: {
+      color: "#3399cc",
+    },
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+</script>
+
+</body>
+</html>
