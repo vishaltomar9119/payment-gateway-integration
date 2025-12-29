@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
+const session = require("express-session");
+const MongoStore = require('connect-mongo');
 require("dotenv").config();
 
 
@@ -16,10 +18,26 @@ mongoose.connect(dbURI)
   });
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var authRouter = require('./routes/auth');
 
 var app = express();
 app.use(express.json());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secretpassword',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: dbURI,
+    collectionName: 'sessions',
+    ttl: 60 * 60, // 1 hour
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60,
+    httpOnly: true,
+  }
+}));
+
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -31,8 +49,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+const isAuth = (req, res, next) => {
+  const publicPaths = ['/login', '/auth/google', '/auth/google/callback'];
+  // Allow public routes without session
+  if (publicPaths.includes(req.path)) {
+    return next();
+  }
+  // Check session
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  
+  next();
+};
+
+
+
+app.use(isAuth);
+
+
+
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/', authRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

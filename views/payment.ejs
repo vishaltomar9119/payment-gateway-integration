@@ -3,153 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Payment Page</title>
+  <title>My E-commerce Store</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background-color: #3399cc;
+      padding: 15px 30px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Container */
     .container {
       width: 90%;
       max-width: 1200px;
-      margin: auto;
-      padding: 20px;
+      margin: 30px auto;
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      font-size: 28px;
     }
 
+    /* Products grid */
     .products {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
-      justify-content: center;
     }
 
     .product-card {
-      width: 260px;
       background: white;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
     .product-card img {
       width: 100%;
-      border-radius: 8px;
+      height: 180px;
+      object-fit: cover;
+      transition: transform 0.3s;
     }
 
-    .product-card h3 {
+    .product-card img:hover {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .product-info h3 {
+      font-size: 20px;
       margin: 10px 0;
     }
 
     .price {
       font-size: 18px;
-      margin-bottom: 10px;
+      color: #3399cc;
+      margin-bottom: 15px;
+      font-weight: 500;
     }
 
     .buy-btn {
-      padding: 10px 15px;
+      background: #ff6600;
       border: none;
-      background: #3399cc;
       color: white;
-      font-size: 15px;
+      padding: 10px 20px;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s;
     }
 
     .buy-btn:hover {
-      background: #287aa3;
+      background: #e65500;
     }
 
-    .product-card img {
-  width: 100%;
-  height: 180px;      /* Ensures all images same height */
-  object-fit: cover;  /* Makes images auto-fit cleanly */
-  border-radius: 8px;
-}
+    /* Footer */
+    footer {
+      background: #333;
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav a {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>🛒 Choose Your Product</h1>
-
- <div class="products">
-
-  <!-- Product 1 -->
-  <div class="product-card">
-    <img src="images/headphone.jpeg" alt="Product 1">
-    <h3>Wireless Headphones</h3>
-    <div class="price">₹999</div>
-    <button class="buy-btn" onclick="startPayment(999)">Buy Now</button>
+<header>
+  <h1>🛍️ My Shop</h1>
+  <nav>
+    <a href="/logout">logout</a>
+    <a href="/profile">Profile</a>
+  </nav>
+</header>
+  <div class="container">
+    <h2>Featured Products</h2>
+    <div class="products">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+          <img src="<%= product.image %>" alt="<%= product.name %>">
+          <div class="product-info">
+            <h3><%= product.name %></h3>
+            <div class="price">₹<%= product.price %></div>
+            <button class="buy-btn" onclick="startPayment(<%= product.price %>)">Buy Now</button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
   </div>
 
-  <!-- Product 2 -->
-  <div class="product-card">
-    <img src="images/smartwath.png" alt="Product 2">
-    <h3>Smart Watch</h3>
-    <div class="price">₹1499</div>
-    <button class="buy-btn" onclick="startPayment(1499)">Buy Now</button>
-  </div>
 
-  <!-- Product 3 -->
-  <div class="product-card">
-    <img src="images/speaker.png" alt="Product 3">
-    <h3>Bluetooth Speaker</h3>
-    <div class="price">₹699</div>
-    <button class="buy-btn" onclick="startPayment(699)">Buy Now</button>
-  </div>
-
-</div>
-
-</div>
-
+<footer>
+  &copy; 2025 My Shop. All Rights Reserved.
+</footer>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 async function startPayment(amount) {
-  // Create order from backend
   const response = await fetch("http://localhost:3000/create-order", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount }),
   });
   const data = await response.json();
 
   const options = {
-    key: "rzp_test_RhbFZxqvrbs4I0", // Replace with your Razorpay Key ID
+    key: "rzp_test_RhbFZxqvrbs4I0",
     amount: amount * 100,
     currency: "INR",
     name: "My Shop",
     description: "Purchase Product",
-    order_id: data.data.id, 
-
+    order_id: data.data.id,
     handler: async function (response) {
-      // Verify payment
       const verify = await fetch("http://localhost:3000/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(response),
+        body: JSON.stringify({
+      ...response,
+      amount: amount
+      }),
       });
-
       const result = await verify.json();
       alert(result.message);
     },
-
-    theme: {
-      color: "#3399cc",
-    },
+    theme: { color: "#ff6600" },
   };
 
   const rzp = new Razorpay(options);

@@ -1,14 +1,17 @@
 const razorpay = require("../config/razorpay");
 const crypto = require("crypto");
-
+const Product = require('../models/product')
+const Payment = require('../models/payment')
 const paymentController = {};
 
 
 const getPaymentPage = async (req, res) => {
     try {
+        const products = await Product.find(); 
         res.render('payment', {
             title: "payment",
-            key_id : process.env.RAZORPAY_KEY_ID
+            key_id : process.env.RAZORPAY_KEY_ID,
+            products:products
         })
 
     } catch (error) {
@@ -38,7 +41,7 @@ const createOrder = async (req, res) => {
 // Verify Payment Signature
 const verifyPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount} = req.body;
 
         const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -47,6 +50,18 @@ const verifyPayment = async (req, res) => {
         const generated_signature = hmac.digest("hex");
 
         if (generated_signature === razorpay_signature) {
+
+            const payment = new Payment({
+                user: req.session.user.id,                 
+                razorpay_order_id,
+                razorpay_payment_id,
+                amount,
+                status: "Verified",
+                createdAt: new Date()
+            });
+
+            await payment.save();
+
             res.json({ success: true, message: "Payment Verified" });
         } else {
             res.status(400).json({ success: false, message: "Payment Failed!" });
@@ -57,9 +72,22 @@ const verifyPayment = async (req, res) => {
 
 };
 
+const profile = async(req , res)=>{  
+  try{
+    const user = req.session.user;
+     res.render('profile', {
+            title: "profile",
+            user:user
+        })
+  }catch(err){
+    res.send(err)
+  }
+}
+
 
 paymentController.createOrder = createOrder;
 paymentController.verifyPayment = verifyPayment;
 paymentController.getPaymentPage = getPaymentPage;
+paymentController.profile = profile;
 
 module.exports = paymentController;
