@@ -10,12 +10,12 @@ require("dotenv").config();
 
 
 
-// const dbURI = 'mongodb://localhost:27017/its';
-// mongoose.connect(dbURI)
-//   .then(() => console.log('Connected to MongoDB'))
-//   .catch((error) => {
-//     console.error('Error connecting to MongoDB:', error.message);
-//   });
+const dbURI = process.env.MONGODB_URI;
+mongoose.connect(dbURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error.message);
+  });
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
@@ -23,20 +23,20 @@ var authRouter = require('./routes/auth');
 var app = express();
 app.use(express.json());
 
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'secretpassword',
-//   resave: false,
-//   saveUninitialized: false,
-//   store: MongoStore.create({
-//     mongoUrl: dbURI,
-//     collectionName: 'sessions',
-//     ttl: 60 * 60, // 1 hour
-//   }),
-//   cookie: {
-//     maxAge: 1000 * 60 * 60,
-//     httpOnly: true,
-//   }
-// }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secretpassword',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: dbURI,
+    collectionName: 'sessions',
+    ttl: 60 * 60, // 1 hour
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60,
+    httpOnly: true,
+  }
+}));
 
 
 // view engine setup
