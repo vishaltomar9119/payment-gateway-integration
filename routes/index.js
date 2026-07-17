@@ -14,7 +14,7 @@ router.post("/verify-payment", verifyPayment);
 
 router.get('/profile',profile);
 
-router.get('/test' , async(res,res)=>{
+router.get('/test' , async(req,res)=>{
     try{
        res.send("testing")
     }catch(err){
