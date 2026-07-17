@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 const isAuth = (req, res, next) => {
-  const publicPaths = ['/login', '/auth/google', '/auth/google/callback'];
+  const publicPaths = ['/login', '/auth/google', '/auth/google/callback', '/test'];
   // Allow public routes without session
   if (publicPaths.includes(req.path)) {
     return next();
